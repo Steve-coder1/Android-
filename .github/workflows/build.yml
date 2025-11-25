@@ -1,29 +1,24 @@
 name: Build Kivy APK
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
-  build-apk:
-    runs-on: ubuntu-20.04  # Buildozer works best on older Ubuntu
-
+  build:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Build APK using Buildozer Docker
-      uses: kivy/buildozer-action@v1
-      with:
-        buildozer_version: latest
-        target: android
-        command: buildozer android debug
+      - name: Build APK with Buildozer in Docker
+        uses: kivy/buildozer-action@v1
+        with:
+          buildozer_version: latest
+          target: android
+          command: buildozer android debug
+          # This action uses its own Docker image (based on Ubuntu 20.04 internally)
+          # so you don't need to rely on GitHub's ubuntu-20.04 runner
 
-    - name: Upload APK as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: helloworld-debug-apk
-        path: bin/*.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: bin/*.apk
