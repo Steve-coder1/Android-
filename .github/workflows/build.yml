@@ -2,41 +2,28 @@ name: Build Kivy APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-apk:
+    runs-on: ubuntu-20.04  # Buildozer works best on older Ubuntu
 
     steps:
-      # 1. Checkout repo
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # 2. Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Build APK using Buildozer Docker
+      uses: kivy/buildozer-action@v1
+      with:
+        buildozer_version: latest
+        target: android
+        command: buildozer android debug
 
-      # 3. Install Buildozer and dependencies
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y python3-pip git zip unzip openjdk-17-jdk
-          python3 -m pip install --upgrade pip
-          pip install buildozer
-
-      # 4. Build APK
-      - name: Build APK
-        run: |
-          buildozer android debug
-
-      # 5. Upload APK artifact (updated to v4)
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-kivy-app-apk
-          path: bin/*.apk
+    - name: Upload APK as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: helloworld-debug-apk
+        path: bin/*.apk
