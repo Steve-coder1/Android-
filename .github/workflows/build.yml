@@ -1,6 +1,5 @@
 name: Build Kivy APK
 
-# Trigger on push to main or manual run
 on:
   push:
     branches:
@@ -12,11 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout your repo
+      # 1. Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Install Python
+      # 2. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -30,11 +29,17 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install buildozer
 
-      # 4. Build the APK
+      # 4. Build APK
       - name: Build APK
         run: |
           buildozer android debug
 
+      # 5. Upload APK artifact (updated to v4)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-kivy-app-apk
+          path: bin/*.apk
       # 5. Upload APK artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
